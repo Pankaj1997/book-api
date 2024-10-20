@@ -1,0 +1,39 @@
+---
+- name: Setup Python App
+  hosts: all   
+  become: yes                 # Use become to execute tasks with sudo privileges
+  tasks:
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+      when: ansible_os_family == "Debian"  # Use for Debian-based systems (Ubuntu, etc.)
+      
+    - name: Install Git (RHEL/CentOS)
+      yum:
+        name: git
+        state: present
+      when: ansible_os_family == "RedHat"  # Use for RedHat-based systems (CentOS, RHEL)
+
+    - name: Clone the repository
+      git:
+        repo: 'https://github.com/your_username/your_repository.git'  # Replace with your repository URL
+        dest: /home/ec2-user/bookapp       # Replace with your desired destination path
+
+    - name: Install Python
+      apt:
+        name: python3
+        state: present
+      when: ansible_os_family == "Debian"  # Use for Debian-based systems (Ubuntu, etc.)
+      
+    - name: Install Python (RHEL/CentOS)
+      yum:
+        name: python3
+        state: present
+      when: ansible_os_family == "RedHat"  # Use for RedHat-based systems (CentOS, RHEL)
+
+    - name: Change to the directory and run the Python script
+      shell: |
+        python3 app.py  # Adjust the path to your app.py
+      args:
+        chdir: /home/ec2-user/bookapp/app  # Change to the directory before running the command

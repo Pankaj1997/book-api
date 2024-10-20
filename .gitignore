@@ -1,0 +1,4 @@
+tf-ec2/*.tfstate
+tf-ec2/*.tfstate.backup
+tf-ec2/.terraform/
+tf-ec2/*.tfplan
