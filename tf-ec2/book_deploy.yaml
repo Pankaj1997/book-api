@@ -1,39 +1,53 @@
 ---
 - name: Setup Python App
-  hosts: all   
+  hosts: all
+  #roles:
+  #  - geerlingguy.docker   
+  vars:
+    image_name: "{{ image_name }}"
+    tag: "{{ tag }}"
   become: yes                 # Use become to execute tasks with sudo privileges
   tasks:
-    - name: Install Git
+    - name: Install Docker on Ubuntu
       apt:
-        name: git
+        name: docker
         state: present
-      when: ansible_os_family == "Debian"  # Use for Debian-based systems (Ubuntu, etc.)
-      
-    - name: Install Git (RHEL/CentOS)
+      when: ansible_os_family == "Debian"
+    - name: Install Docker on CentOS
       yum:
-        name: git
+        name: docker
         state: present
-      when: ansible_os_family == "RedHat"  # Use for RedHat-based systems (CentOS, RHEL)
-
-    - name: Clone the repository
-      git:
-        repo: 'https://github.com/your_username/your_repository.git'  # Replace with your repository URL
-        dest: /home/ec2-user/bookapp       # Replace with your desired destination path
-
-    - name: Install Python
+      when: ansible_os_family == "RedHat"
+    - name: Start and enable Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+    - name: Install required packages for Docker Compose
       apt:
-        name: python3
+        name:
+          - curl
+          - python3-pip
         state: present
-      when: ansible_os_family == "Debian"  # Use for Debian-based systems (Ubuntu, etc.)
-      
-    - name: Install Python (RHEL/CentOS)
-      yum:
-        name: python3
-        state: present
-      when: ansible_os_family == "RedHat"  # Use for RedHat-based systems (CentOS, RHEL)
+      when: ansible_os_family == "Debian"
 
-    - name: Change to the directory and run the Python script
-      shell: |
-        python3 app.py  # Adjust the path to your app.py
-      args:
-        chdir: /home/ec2-user/bookapp/app  # Change to the directory before running the command
+    - name: Install Docker Compose
+      get_url:
+        url: https://github.com/docker/compose/releases/latest/download/docker-compose-Linux-x86_64
+        dest: /usr/bin/docker-compose
+        mode: 'u+x,g+x'
+    - name: create a directory
+      file:
+          path: /opt/docker/bookkeeper
+          state: directory
+          recurse: yes
+    - name: copy Docker-Compose
+      template:
+       src: "{{item.src}}"
+       dest: "{{item.dest}}"
+       backup: yes
+      with_items:
+       -  {src: docker-compose.yaml, dest: /opt/docker/bookkeeper/docker-compose.yaml}
+
+    - name: start docker-compose
+      shell: "docker-compose -f /opt/docker/bookkeeper/docker-compose.yaml up -d"

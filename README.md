@@ -25,7 +25,7 @@ The dependencies are listed in the `requirements.txt` file. Install them using:
 ### Installation
 1. Clone the repository or download the source code:
 ```
-git clone <repository-url>
+git clone https://github.com/Pankaj1997/book-api.git
 cd app
 ```
 2. Install the required Python packages:
@@ -47,7 +47,7 @@ Make sure you have Docker and Docker-Compose installed.
 ### Installation
 1. Clone the repository or download the source code:
 ```
-git clone <repository-url>
+git clone https://github.com/Pankaj1997/book-api.git
 cd app
 ```
 2. Use docker-compose command
@@ -127,4 +127,35 @@ If the request data is invalid or incomplete, the API will return a 400 Bad Requ
     "year": 1951
   }
 }
+```
+## Deploy on Ec2 Instance
+### Requirements
+* Make sure you have terraform installed.
+* Configure your AWS credentials using `aws configure` or the environment variables
+```
+export AWS_ACCESS_KEY_ID="your-access-key-id"
+export AWS_SECRET_ACCESS_KEY="your-secret-access-key"
+export AWS_DEFAULT_REGION="your-preferred-region"
+```
+* Use `ssh-keygen` command to create a SSH keypair
+  
+### Installation
+1. Clone the repository or download the source code:
+```
+git clone https://github.com/Pankaj1997/book-api.git
+cd tf-ec2
+```
+2. Configure your SSH key pair path in `vars.tf`
+3. Use terraform commands to run
+```
+terraform init          # Initialize Terraform
+terraform plan          # Plan changes and show what will be applied
+terraform apply         # Apply the changes
+```
+### Output
+You'll get an Output like the following:
+```
+Outputs:
+
+API_URL = "API is running on http://13.201.55.0:5000"
 ```

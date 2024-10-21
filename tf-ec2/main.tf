@@ -61,7 +61,12 @@ resource "aws_security_group" "allow_ssh" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] #can be changed to your VPN Outbound IP
   }
-
+  ingress {
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] #can be changed to your VPN Outbound IP
+  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -93,9 +98,35 @@ resource "aws_instance" "book_server" {
     aws_subnet.public,
     aws_security_group.allow_ssh
   ]
+  # Optional: Ensure the instance is fully running before executing the provisioner
+  provisioner "remote-exec" {
+    inline = [
+      "echo Instance is up and running."
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file(var.private_key)  # Path to your private key
+      host        = self.public_ip
+    }
+  }
+
+  provisioner "local-exec" {
+    command = <<EOT
+      ansible-playbook -i "${self.public_ip}," book_deploy.yaml --user ec2-user -e "image_name=${var.image_name} tag=${var.image_tag}"
+    EOT
+
+    environment = {
+      ANSIBLE_HOST_KEY_CHECKING = "False"  # Optional: Disable host key checking for simplicity
+    }
+
+    # Ensure this runs only after the instance is created and accessible
+    when = create
+  }
 }
 
-output public_ip {
-  value       = aws_instance.book_server.public_ip
+output API_URL {
+  value       = "API is running on http://${aws_instance.book_server.public_ip}:5000"
   description = "Public Ip of the server"
 }
