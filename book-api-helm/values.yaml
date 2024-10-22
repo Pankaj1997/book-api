@@ -1,0 +1,27 @@
+
+replicaCount: 2
+
+image:
+  repository: pankaj2212/bookkeeper
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 5000
+
+ingress:
+  enabled: false
+autoscaling:
+  enabled: false
+
+serviceAccount:
+  create: false
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: []

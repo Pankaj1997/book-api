@@ -8,11 +8,6 @@
     tag: "{{ tag }}"
   become: yes                 # Use become to execute tasks with sudo privileges
   tasks:
-    - name: Install Docker on Ubuntu
-      apt:
-        name: docker
-        state: present
-      when: ansible_os_family == "Debian"
     - name: Install Docker on CentOS
       yum:
         name: docker
@@ -23,13 +18,6 @@
         name: docker
         state: started
         enabled: yes
-    - name: Install required packages for Docker Compose
-      apt:
-        name:
-          - curl
-          - python3-pip
-        state: present
-      when: ansible_os_family == "Debian"
 
     - name: Install Docker Compose
       get_url:

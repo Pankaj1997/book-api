@@ -127,6 +127,6 @@ resource "aws_instance" "book_server" {
 }
 
 output API_URL {
-  value       = "API is running on http://${aws_instance.book_server.public_ip}:5000"
-  description = "Public Ip of the server"
+  value       = "API is running on  http://${aws_instance.book_server.public_ip}:5000"
+  description = "API URL"
 }

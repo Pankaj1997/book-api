@@ -3,3 +3,11 @@ tf-ec2/*.tfstate.backup
 tf-ec2/.terraform/
 tf-ec2/*.tfplan
 tf-ec2/.terraform.lock.hcl
+
+
+tf-eks/*.tfstate
+tf-eks/*.tfstate.backup
+tf-eks/.terraform/
+tf-eks/*.tfplan
+tf-eks/.terraform.lock.hcl
+tf-eks/.terraform.lock.hcl.info

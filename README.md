@@ -11,7 +11,7 @@ This is a simple Book Library API built with Flask. The API allows users to perf
 - [Run Using Helm](#run-using-helm)
 - [API Endpoints](#api-endpoints)
 - [Error Handling](#error-handling)
-- [Deploy on an EC2 Instance](#deploy-on-ec2)
+- [Deploy on an EC2 Instance](#deploy-on-ec2-instance)
 - [Deploy on EKS](#deploy-on-eks)
 
 ## Run Using Python

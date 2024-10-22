@@ -1,0 +1,67 @@
+---
+- name: Install Git, kubectl, AWS CLI, and Helm on CentOS
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Install Git
+      yum:
+        name: git
+        state: present
+    - name: Install curl
+      yum:
+        name: curl
+        state: present
+
+    - name: Install AWS CLI
+      yum:
+        name: awscli
+        state: present
+
+    - name: Install kubectl
+      shell: |
+        curl -o /usr/local/bin/kubectl https://s3.us-west-2.amazonaws.com/amazon-eks/1.23.17/2024-09-11/bin/linux/amd64/kubectl
+        chmod +x /usr/local/bin/kubectl
+
+    - name: Install Helm
+      shell: |
+        export PATH=$PATH:/usr/local/bin
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        ./get_helm.sh
+        DESIRED_VERSION=v3.8.2 bash get_helm.sh
+      
+
+- name: Clone Git repository and deploy Helm chart
+  hosts: all
+  remote_user: ec2-user
+  vars:
+    git_repo: "https://github.com/Pankaj1997/book-api.git"  # Replace with your repository URL
+    chart_path: "book-api-helm"  # Path to the Helm chart in the repo
+    release_name: "book-api"  # Name of the Helm release
+    namespace: "exercise"  # Namespace for the Helm release
+    kubeconfig: "/home/ec2-user/.kube/config"  # Path to kubeconfig file
+
+  tasks:
+    - name: Clone Git repository
+      git:
+        repo: "{{ git_repo }}"
+        dest: /tmp/repo
+        version: HEAD
+
+    - name: Authenticate to EKS cluster
+      shell: |
+        aws eks --region {{ eks_region }} update-kubeconfig --name {{ eks_cluster_name }}
+      environment:
+        KUBECONFIG: "{{ kubeconfig }}"
+      args:
+        executable: /bin/bash
+
+    - name: Deploy Helm chart
+      shell: |
+        kubectl create namespace {{ namespace }} && helm upgrade --install {{ release_name }} /tmp/repo/{{ chart_path }} --namespace {{ namespace }}
+    - name: Retrieve LoadBalancer IP and save to /tmp/lb_ip.txt
+      shell: |
+        kubectl get svc book-api -n {{ namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' > /tmp/lb_ip.txt
+      args:
+        executable: /bin/bash
