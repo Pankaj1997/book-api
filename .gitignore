@@ -11,3 +11,4 @@ tf-eks/.terraform/
 tf-eks/*.tfplan
 tf-eks/.terraform.lock.hcl
 tf-eks/.terraform.lock.hcl.info
+tf-eks/.terraform.tfstate.lock.info

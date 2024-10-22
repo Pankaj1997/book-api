@@ -146,6 +146,7 @@ If the request data is invalid or incomplete, the API will return a 400 Bad Requ
 }
 ```
 ## Deploy on Ec2 Instance
+The terraform script will spawn a public ec2-instance and deploy the application using ansible and docker-compose.
 ### Requirements
 * Make sure you have terraform installed.
 * Configure your AWS credentials using `aws configure` or the environment variables
@@ -178,6 +179,12 @@ API_URL = "API is running on http://13.201.55.0:5000"
 ```
 
 ## Deploy on EKS
+The terraform script will spawn the following:
+1. VPC with public and private subnets
+2. EKS with private API server endpoint
+3. Jump server in public subnet
+4. login eks cluster using jump server and deploy the helm package on eks cluster.
+
 ### Requirements
 * Make sure you have terraform installed.
 * Configure your AWS credentials using `aws configure` or the environment variables
@@ -192,7 +199,7 @@ export AWS_DEFAULT_REGION="your-preferred-region"
 1. Clone the repository or download the source code:
 ```
 git clone https://github.com/Pankaj1997/book-api.git
-cd tf-ec2
+cd tf-eks
 ```
 2. Configure your SSH key pair path in `vars.tf`
 3. Use terraform commands to run
