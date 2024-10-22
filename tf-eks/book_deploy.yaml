@@ -60,8 +60,16 @@
     - name: Deploy Helm chart
       shell: |
         kubectl create namespace {{ namespace }} && helm upgrade --install {{ release_name }} /tmp/repo/{{ chart_path }} --namespace {{ namespace }}
-    - name: Retrieve LoadBalancer IP and save to /tmp/lb_ip.txt
+    
+    - name: Wait for 120 seconds for LoadBalancer to provision
+      pause:
+        seconds: 120
+    - name: Retrieve LoadBalancer URL and save to /tmp/lb_ip.txt
       shell: |
-        kubectl get svc book-api -n {{ namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' > /tmp/lb_ip.txt
+        kubectl get svc book-api -n {{ namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
       args:
         executable: /bin/bash
+      register: loadbalancer_url
+    - name: Print LoadBalancer URL
+      debug:
+        msg: "The LoadBalancer URL is: {{ loadbalancer_url.stdout }}"
